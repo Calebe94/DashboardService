@@ -42,9 +42,9 @@ mongoose.connect(config.DB, { useNewUrlParser: true }, function(error, databese)
   }
 });
 
-app.listen(config.PORT);
+// app.listen(config.PORT);
 
-console.log("> Server running on port: http://localhost:"+config.PORT);
+console.log("> Server(backend) running on port: http://localhost:"+config.PORT);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -59,3 +59,5 @@ app.use(function(req, res, next) {
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
+
+module.exports = app;
