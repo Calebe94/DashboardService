@@ -1,0 +1,23 @@
+{
+  "name": "votaappserver",
+  "version": "1.0.0",
+  "description": "Vota App webservice",
+  "main": "index.js",
+  "scripts": {
+    "test": "supervisor index.js",
+    "start": "node index.js",
+    "createdb": "node scripts/createdb.js"
+  },
+  "author": "calebe94",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.4",
+    "crypto-extra": "^0.4.0",
+    "express": "^4.16.4",
+    "jsonwebtoken": "^8.3.0",
+    "mongodb": "^3.1.8",
+    "mongoose": "^5.3.4",
+    "supervisor": "^0.12.0"
+  }
+}
