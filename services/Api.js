@@ -168,14 +168,37 @@ api_routes.route('/measure/last/:type').get(function(req, res){
 
 api_routes.route('/measure/today/:type').get(function(req, res){
     var today = new Date();
-    var start = today.setHours(00,00,01);
-    var end = today.setHours(23,59, 59);
-
+    var average_today = 0;
+    var elements = 0;
+    console.log("> Hora Atual: "+today.getHours());
     if( req.params.type == "temperature" )
     {
-        Temperature.find({ datetime: {$gte: start, $lt: end}}, function (err, docs) { 
-            console.log(docs) ;
-        });
+        for (var index = 0; index < (today.getHours()-1); index++)
+        {
+            var today = new Date();
+            var start = today.setHours(index,00,00);
+            var end = today.setHours((index+1),59, 59);
+            console.log("> Hora: "+index);
+            Temperature.find({ datetime: {$gte: start, $lt: end}}, function (err, docs) { 
+                // console.log(docs) ;
+                if(err)
+                {
+                    console.log(err);
+                }
+                else
+                {
+                    average_today = 0;
+                    elements = 0;
+                    docs.forEach(element => {
+                        elements+=1;
+                        average_today+=parseFloat(element.value);
+                        console.log("> Element:"+element);
+                        // console.log(average_today);
+                    });
+                    console.log("> Média:"+ (average_today/(elements)));
+                }
+            });
+        }
         res.send({ today: "OK" });
     }
     else if( req.params.type == "humidity" )
