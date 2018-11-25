@@ -30,21 +30,42 @@ api_routes.route('/add/:type').post(function(req, res){
     var response = "";
     if( req.params.type == "temperature")
     {
-        try {
+        try 
+        {
             var data = new Temperature({ value: req.body.measure, datetime: timestamp });
             data.save();
             response = { measure: "OK" };
-        } catch (error) {
+        } 
+        catch (error) 
+        {
             response = { measure: "DATABASE ERROR" };
         }
     }
     else if( req.params.type == "humidity")
     {
-        try {
+        try 
+        {
             var data = new Humidity( { value: req.body.measure, datetime: timestamp } )
             data.save();
             response = { measure: "OK" };
-        } catch (error) {
+        }
+        catch (error) 
+        {
+            response = { measure: "DATABASE ERROR" };
+        }
+    }
+    else if( req.params.type == "measure")
+    {
+        try 
+        {
+            var humidity = new Humidity( { value: req.body.humidity, datetime: timestamp } )
+            humidity.save();
+            var temperature = new Temperature({ value: req.body.temperature, datetime: timestamp });
+            temperature.save();
+            response = { measure: "OK" };
+        } 
+        catch (error) 
+        {
             response = { measure: "DATABASE ERROR" };
         }
     }

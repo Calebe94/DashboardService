@@ -50,10 +50,14 @@ Rota para adicionar medidas de temperatura ou umidade no banco de dados.
   /api/add/:type
 ```
   * Tipo: POST
-  * Recebe: *humidity* ou *temperature* como parâmetro de URL
+  * Recebe: *humidity*, *temperature* ou *measure* como parâmetro de URL
+    * measure: { temperature: value, humidity: value }
   * Retorna:  { measure: String } 
 
 * Teste: 
+
+      curl -d '{"temperature": "10", "humidity": "15"}' -H "Content-Type: application/json" -X POST http://localhost:8080/api/add/measure
+
       curl -d '{"measure": "10"}' -H "Content-Type: application/json" -X POST http://localhost:8080/api/add/humidity
 
 ### Setpoints
