@@ -1,6 +1,7 @@
-# VotaAppServer
 
-Web service para o [VotaApp](https://github.com/thecobra159/VotaAPP/tree/develop).
+DashboardService
+
+A backend webservice for [IDS_Dashboard](https://github.com/Calebe94/IDS_Dashboard).
 
 ## Setup
 
