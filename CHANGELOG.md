@@ -6,7 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 
-- Update and improvement routes
+- Update and improvement routes.
+- Merge *aquario* branch to master.
+- Changed Repository name from DashboardService to FishTankService.
 
 ### Added
 - This CHANGELOG file to hopefully serve as an evolving example of a

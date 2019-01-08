@@ -6,8 +6,9 @@
 
 ## Change
 
-- [] Merge to Master
-- [] Change Repository name
+- [] Change README
+- [x] Merge to Master
+- [x] Change Repository name
 
 ---
 
