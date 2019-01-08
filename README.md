@@ -27,21 +27,6 @@ A backend webservice for [IDS_Dashboard](https://github.com/Calebe94/IDS_Dashboa
 
 ## Rotas
 
-### Autenticação
-
-Rota para a autenticação do eleitor.
-
-```
-  /api/auth/
-```
-  * Tipo: POST
-  * Recebe: JSON { username: username, password: password}
-  * Retorna: {"auth":true}%
-
-* Teste: 
-
-      curl -d '{"username": "123412341234", "password": "spcsp2018"}' -H "Content-Type: application/json" -X POST http://localhost:8080/api/auth/
-
 ### Adicionar Medidas
 
 Rota para adicionar medidas de temperatura ou umidade no banco de dados.

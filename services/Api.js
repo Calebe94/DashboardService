@@ -2,214 +2,142 @@ var express = require('express')
 
 var api_routes = express.Router()
 
-var { User, Setpoints, Humidity, Temperature } = require('../models/Model');
+var { Load } = require('../models/Model');
 
-api_routes.route('/auth').post(function(req, res){
-    User.findOne({name: req.body.username}).exec(function(error, user){
-        if(error) res.send( { auth: false } );
+/**************************************************************************************/
+/*************************************** GET ******************************************/
+/**************************************************************************************/
+
+api_routes.route('/get/:type/:number/status').get(function(req, res){
+    Load.find({type: req.params.type, number: req.params.number}, '-_id -__v -parameter -initial -end').exec(function(error, item){
+        if(error)
+        {
+            res.send(JSON.stringify({ status: "DB Error!" }));
+        }
         else
         {
-            try {
-                if(user.password == req.body.password)
-                {
-                    res.send( { auth: true } );
-                }
-                else
-                {
-                    res.send( { auth: false} );
-                }
-            } catch (err) {
-                res.send( { auth: "ERROR" } );
+            try 
+            {
+                res.send(item[0]);
+            }
+            catch (error)
+            {
+                res.send(JSON.stringify({ status: "DB Error!" }));
             }
         }
     });
 });
 
-api_routes.route('/add/:type').post(function(req, res){
-    var timestamp = new Date();
+
+api_routes.route('/get/:type/:number/parameter').get(function(req, res){
+    Load.find({type: req.params.type, number: req.params.number}, '-_id -__v -status -initial -end').exec(function(error, item){
+        if(error)
+        {
+            res.send(JSON.stringify({ status: "DB Error!" }));
+        }
+        else
+        {
+            try 
+            {
+                res.send(item[0]);
+            }
+            catch (error)
+            {
+                res.send(JSON.stringify({ status: "DB Error!" }));
+            }
+        }
+    });
+});
+
+api_routes.route('/get/:type/:number/setpoints').get(function(req, res){
+    Load.find({type: req.params.type, number: req.params.number}, '-_id -__v').exec(function(error, item){
+        if(error)
+        {
+            res.send(JSON.stringify({ status: "DB Error!" }));
+        }
+        else
+        {
+            try 
+            {
+                res.send(item[0]);
+            }
+            catch (error)
+            {
+                res.send(JSON.stringify({ status: "DB Error!" }));
+            }
+        }
+    });
+});
+
+api_routes.route('/get/loads').get(function(req, res){
     var response = "";
-    if( req.params.type == "temperature")
-    {
-        try 
+    Load.find({}, '-_id -__v').exec(function(error, docs){
+        if(error)
         {
-            var data = new Temperature({ value: req.body.measure, datetime: timestamp });
-            data.save();
-            response = { measure: "OK" };
-        } 
-        catch (error) 
-        {
-            response = { measure: "DATABASE ERROR" };
+            res.send(JSON.stringify({ status: "DB Error!" }));
         }
-    }
-    else if( req.params.type == "humidity")
-    {
-        try 
+        else
         {
-            var data = new Humidity( { value: req.body.measure, datetime: timestamp } )
-            data.save();
-            response = { measure: "OK" };
+            try 
+            {
+                res.send(docs);
+            }
+            catch (error) 
+            {
+                res.send(JSON.stringify({ status: "DB Error!" }));
+            }
         }
-        catch (error) 
+    });
+});
+
+
+/**************************************************************************************/
+/*************************************** SET ******************************************/
+/**************************************************************************************/
+
+api_routes.route('/set/:type/:number/time').post(function(req, res){
+    var response = "";
+    Load.findOneAndUpdate({type: req.params.type, number: req.params.number}, { parameter: 'time', initial: req.body.initial, end: req.body.end }).exec(function(error, item){
+        if(error)
         {
-            response = { measure: "DATABASE ERROR" };
+            response = 400;
         }
-    }
-    else if( req.params.type == "measure")
-    {
-        try 
+        else
         {
-            var humidity = new Humidity( { value: req.body.humidity, datetime: timestamp } )
-            humidity.save();
-            var temperature = new Temperature({ value: req.body.temperature, datetime: timestamp });
-            temperature.save();
-            response = { measure: "OK" };
-        } 
-        catch (error) 
-        {
-            response = { measure: "DATABASE ERROR" };
+            response = 200; 
         }
-    }
-    else
-    {
-        response = { measure: "BODY ERROR" };
-    }
-    
+    });
     res.send(response);
 });
 
-api_routes.route('/setpoints/set/:type').post(function(req, res){
+api_routes.route('/set/:type/:number/value').post(function(req, res){
     var response = "";
-    if(req.params.type == "temperature")
-    {
-        Setpoints.findOneAndUpdate( {type: "temperature"},  { minimal_value: req.body.minimal_value, maximum_value: req.body.maximum_value } , { upsert: true }, function(err, item){
-            if(err)
-            {
-                response = { setpoint: "DATABASE ERROR" };
-                res.send(response);
-            }
-            else 
-            {
-                response = { setpoint: "OK" };
-                res.send(response);
-            }
-        });
-    }
-    else if(req.params.type == "humidity")
-    {
-        Setpoints.findOneAndUpdate( {type: "humidity"},  { minimal_value: req.body.minimal_value, maximum_value: req.body.maximum_value } , { upsert: true }, function(err, item){
-            if(err)
-            {
-                response = { setpoint: "DATABASE ERROR" };
-                res.send(response);
-            }
-            else 
-            {
-                response = { setpoint: "OK" };
-                res.send(response);
-            }
-        });
-    }
-    else
-    {
-        response = { setpoint: "BODY ERROR" };
-        res.send(response);
-    }
-    
-});
-
-api_routes.route('/setpoints/get/:type').get(function(req, res){
-    var response = "";
-    Setpoints.findOne( { type: ""+req.params.type }, function(err, item){
-        if(err)
+    Load.findOneAndUpdate({type: req.params.type, number: req.params.number}, { parameter: 'value', initial: req.body.initial, end: req.body.end }).exec(function(error, item){
+        if(error)
         {
-            res.send({ setpoint: "DATABASE ERROR" });
+            response = 400;
         }
         else
         {
-            res.send(item);
+            response = 200; 
         }
     });
+    res.send(response);
 });
 
-api_routes.route('/measure/last/:type').get(function(req, res){
-    if(req.params.type == "temperature")
-    {
-        Temperature.findOne({}, {}, { sort: { 'datetime' : -1 } }, function(err, item) {
-            if(err)
-            {
-                res.send( { measure: "DATABASE ERROR" } );
-            }
-            else
-            {
-                res.send({ measure: item });
-            }
-        });
-    }
-    else if(req.params.type == "humidity")
-    {
-        // -1 is the oldest and 1 is the newest.
-        // Reference: https://stackoverflow.com/questions/12467102/how-to-get-the-latest-and-oldest-record-in-mongoose-js-or-just-the-timespan-bet
-        Humidity.findOne({}, {}, { sort: { 'datetime' : -1 } }, function(err, item) {
-            if(err)
-            {
-                res.send( { measure: "DATABASE ERROR" } );
-            }
-            else
-            {
-                res.send({ measure: item });
-            }
-        });
-    }
-    else
-    {
-        res.send( { measure: "BODY ERROR" } );
-    }
-});
-
-api_routes.route('/measure/today/:type').get(function(req, res){
-    var today = new Date();
-    var average_today = 0;
-    var elements = 0;
-    console.log("> Hora Atual: "+today.getHours());
-    if( req.params.type == "temperature" )
-    {
-        for (var index = 0; index < (today.getHours()-1); index++)
+api_routes.route('/set/:type/:number/disable').post(function(req, res){
+    var response = "";
+    Load.findOneAndUpdate({type: req.params.type, number: req.params.number}, { parameter: 'disabled', initial: "", end: "" }).exec(function(error, item){
+        if(error)
         {
-            var today = new Date();
-            var start = today.setHours(index,00,00);
-            var end = today.setHours((index+1),59, 59);
-            console.log("> Hora: "+index);
-            Temperature.find({ datetime: {$gte: start, $lt: end}}, function (err, docs) { 
-                // console.log(docs) ;
-                if(err)
-                {
-                    console.log(err);
-                }
-                else
-                {
-                    average_today = 0;
-                    elements = 0;
-                    docs.forEach(element => {
-                        elements+=1;
-                        average_today+=parseFloat(element.value);
-                        console.log("> Element:"+element);
-                        // console.log(average_today);
-                    });
-                    console.log("> Média:"+ (average_today/(elements)));
-                }
-            });
+            response = 400;
         }
-        res.send({ today: "OK" });
-    }
-    else if( req.params.type == "humidity" )
-    {
-        Humidity.find({ datetime: {$gte: start, $lt: end}}, function (err, docs) { console.log(docs) } );
-        res.send({ today: "OK" });
-    }
-    else
-    {
-        res.send( { today: "FALSE" } );
-    }
+        else
+        {
+            response = 200; 
+        }
+    });
+    res.send(response);
 });
 
 module.exports = api_routes;
